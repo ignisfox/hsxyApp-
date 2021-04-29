@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wfuhui.modules.help.dao.MemberOrderDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wfuhui.modules.help.entity.MemberOrderEntity" id="memberOrderMap">
+        <result property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="orderId" column="order_id"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.wfuhui.modules.help.entity.MemberOrderEntity">
+		select * from c_member_order where id = #{value}
+	</select>
+	
+	<select id="queryByOrderId" resultType="com.wfuhui.modules.help.entity.MemberOrderEntity">
+		select * from c_member_order where order_id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.wfuhui.modules.help.entity.MemberOrderEntity">
+		select * from c_member_order
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from c_member_order 
+	</select>
+	 
+	<insert id="save" parameterType="com.wfuhui.modules.help.entity.MemberOrderEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into c_member_order
+		(
+			`member_id`, 
+			`order_id`
+		)
+		values
+		(
+			#{memberId}, 
+			#{orderId}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.wfuhui.modules.help.entity.MemberOrderEntity">
+		update c_member_order 
+		<set>
+			<if test="memberId != null">`member_id` = #{memberId}, </if>
+			<if test="orderId != null">`order_id` = #{orderId}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from c_member_order where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from c_member_order where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

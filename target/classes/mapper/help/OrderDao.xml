@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wfuhui.modules.help.dao.OrderDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.wfuhui.modules.help.entity.OrderEntity" id="orderMap">
+        <result property="id" column="id"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="memberId" column="member_id"/>
+        <result property="orderType" column="order_type"/>
+        <association property="member" javaType="com.wfuhui.modules.member.entity.MemberEntity">
+        	<result property="nickname" column="nickname"/>
+        	<result property="avatarUrl" column="avatar_url"/>
+        </association>
+        
+        <association property="courier" javaType="com.wfuhui.modules.member.entity.MemberEntity">
+        	<result property="nickname" column="m_nickname"/>
+        	<result property="avatarUrl" column="m_avatar_url"/>
+        </association>
+        
+        <association property="orderService" javaType="com.wfuhui.modules.help.entity.OrderServiceEntity">
+        	<result property="address" column="address"/>
+        	<result property="logisticsCompany" column="logistics_company"/>
+        	<result property="logisticsNum" column="logistics_num"/>
+        	<result property="pickupTime" column="pickup_time"/>
+        	<result property="remark" column="service_remark"/>
+        	<result property="goodsName" column="service_goods_name"/>
+        	<result property="buyNum" column="service_buy_num"/>
+        	<result property="payPrice" column="pay_price"/>
+        	<result property="expressSpec" column="express_spec"/>
+        	<result property="roomNumber" column="room_number"/>
+        </association>
+    </resultMap>
+    
+	<select id="queryObject" resultMap="orderMap">
+		select t.*, ui.nickname, ui.avatar_url from c_order t
+		left join base_member ui on t.member_id=ui.id
+		where t.id = #{value}
+	</select>
+
+	<select id="queryList" resultMap="orderMap">
+		select t.*, ui.nickname, ui.avatar_url, 
+		mi.nickname m_nickname, mi.avatar_url m_avatar_url,
+		os.address, os.remark service_remark, os.pickup_time, os.logistics_company, os.logistics_num, os.pickup_end_time, 
+		os.goods_name service_goods_name, os.buy_num service_buy_num, os.pay_price, os.express_spec, os.room_number from c_order t
+		left join base_member ui on t.member_id=ui.id
+		left join c_order_service os on t.id = os.order_id
+		left join c_member_order mo on mo.order_id = t.id
+		left join base_member mi on mi.id=mo.member_id
+		<where>
+			<if test="orderStatus != null and orderStatus != -1">
+				t.order_status = #{orderStatus}
+			</if>
+			<if test="memberId != null">
+				and t.member_id = #{memberId}
+			</if>
+			<if test="orderType != null">
+				and t.order_type = #{orderType}
+			</if>
+			<if test="orderTypes != null">
+				and t.order_type in (${orderTypes})
+			</if>
+			<if test="orderStatuses != null">
+				and t.order_status in (${orderStatuses})
+			</if>
+		</where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by t.${sidx} ${order}
+            </when>
+			<otherwise>
+                order by t.id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from c_order 
+		<where>
+			<if test="orderStatus != null and orderStatus != -1">
+				order_status = #{orderStatus}
+			</if>
+			<if test="memberId != null">
+				and member_id = #{memberId}
+			</if>
+			<if test="orderType != null">
+				and order_type = #{orderType}
+			</if>
+			<if test="orderStatuses != null">
+				and t.order_status in (${orderStatuses})
+			</if>
+			<if test="orderTypes != null">
+				and order_type in (${orderTypes})
+			</if>
+		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.wfuhui.modules.help.entity.OrderEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into c_order
+		(
+			`member_id`, 
+			`order_number`, 
+			`total_amount`, 
+			`order_status`, 
+			`remark`, 
+			`create_time`,
+			`order_type`
+		)
+		values
+		(
+			#{memberId}, 
+			#{orderNumber}, 
+			#{totalAmount}, 
+			#{orderStatus}, 
+			#{remark}, 
+			#{createTime},
+			#{orderType}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.wfuhui.modules.help.entity.OrderEntity">
+		update c_order 
+		<set>
+			<if test="orderNumber != null">`id` = #{orderNumber}, </if>
+			<if test="totalAmount != null">`total_amount` = #{totalAmount}, </if>
+			<if test="orderStatus != null">`order_status` = #{orderStatus}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from c_order where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from c_order where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateByOrderNum" parameterType="com.wfuhui.modules.help.entity.OrderEntity">
+		update c_order set `order_status` = #{orderStatus} where order_number = #{orderNumber}
+	</update>
+	
+	<!-- 查询近7天已完成订单数 -->
+	<select id="queryOrderCount" resultType="java.util.Map">
+		SELECT date_format(create_time, '%Y-%m-%d') as createTime, count(1) count
+		FROM c_order
+		where DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= date(create_time)
+		<!-- order_status = 4 已完成 -->
+		and order_status = 4
+		GROUP BY date_format(create_time, '%Y-%m-%d')
+	</select>
+	
+	
+	<select id="queryCourierOrder" resultMap="orderMap">
+		select t.*, ui.nickname, ui.avatar_url, os.address, os.remark, os.pickup_time from c_member_order oo
+		left join c_order t on oo.order_id = t.id
+		left join base_member ui on t.member_id=ui.id
+		left join c_order_service os on t.id = os.order_id
+		<where>
+			<if test="courier != null">
+				oo.member_id = #{courier}
+			</if>
+			<if test="orderStatus != null and orderStatus != -1">
+				and t.order_status = #{orderStatus}
+			</if>
+			<if test="memberId != null">
+				and t.member_id = #{memberId}
+			</if>
+			<if test="orderType != null">
+				and t.order_type = #{orderType}
+			</if>
+			<if test="orderTypes != null">
+				and t.order_type in (${orderTypes})
+			</if>
+			<if test="orderStatuses != null">
+				and t.order_status in (${orderStatuses})
+			</if>
+		</where>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by t.${sidx} ${order}
+            </when>
+			<otherwise>
+                order by t.id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+</mapper>
