@@ -1,6 +1,8 @@
+sqlIp: 47.119.159.55
+#sqlIp: localhost
 spring:
     datasource:
-        url: jdbc:mysql://47.119.159.55:3306/c_mail?autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&serverTimezone=CTT
+        url: jdbc:mysql://${sqlIp}:3306/c_mail?autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&serverTimezone=CTT&allowPublicKeyRetrieval=true
         username: c_mail
         password: root
         #连接池的配置信息

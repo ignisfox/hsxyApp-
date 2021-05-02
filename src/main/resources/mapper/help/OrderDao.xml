@@ -201,4 +201,13 @@
 		</if>
 	</select>
 
+
+
+	<select id="queryAllDormitorys" resultType="com.wfuhui.modules.help.entity.DormitoryBuildingEntity">
+		select * from dormitory_building
+	</select>
+
+	<select id="queryAllPickupAddress" resultType="com.wfuhui.modules.help.entity.PickupAddressEntity">
+		select * from pickup_address
+	</select>
 </mapper>

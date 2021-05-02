@@ -3,6 +3,7 @@ package com.wfuhui.modules.help.service.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.wfuhui.modules.help.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,9 +13,6 @@ import com.wfuhui.common.utils.Query;
 import com.wfuhui.modules.help.dao.MemberOrderDao;
 import com.wfuhui.modules.help.dao.OrderDao;
 import com.wfuhui.modules.help.dao.OrderServiceDao;
-import com.wfuhui.modules.help.entity.MemberOrderEntity;
-import com.wfuhui.modules.help.entity.OrderEntity;
-import com.wfuhui.modules.help.entity.OrderServiceEntity;
 import com.wfuhui.modules.help.service.OrderService;
 
 
@@ -112,5 +110,15 @@ public class OrderServiceImpl implements OrderService {
 	public List<OrderEntity> queryCourierOrder(Query query) {
 		return orderDao.queryCourierOrder(query);
 	}
-	
+
+	@Override
+	public List<DormitoryBuildingEntity> queryAllDormitorys() {
+
+		return orderDao.queryAllDormitorys();
+	}
+
+	@Override
+	public List<PickupAddressEntity> queryAllPickupAddress() {
+		return orderDao.queryAllPickupAddress();
+	}
 }

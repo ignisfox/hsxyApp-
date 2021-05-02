@@ -52,8 +52,7 @@
 		insert into c_order_service
 		(
 			`order_id`, 
-			`logistics_num`, 
-			`logistics_company`, 
+			`logistics_num`,
 			`address`, 
 			`remark`, 
 			`pickup_time`, 
@@ -69,8 +68,7 @@
 		values
 		(
 			#{orderId}, 
-			#{logisticsNum}, 
-			#{logisticsCompany}, 
+			#{logisticsNum},
 			#{address}, 
 			#{remark}, 
 			#{pickupTime}, 

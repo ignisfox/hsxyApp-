@@ -3,6 +3,8 @@ package com.wfuhui.modules.help.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.wfuhui.modules.help.entity.DormitoryBuildingEntity;
+import com.wfuhui.modules.help.entity.PickupAddressEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.wfuhui.common.utils.Query;
@@ -21,5 +23,8 @@ public interface OrderDao extends BaseDao<OrderEntity> {
 	List<Map<String, String>> queryOrderCount();
 
 	List<OrderEntity> queryCourierOrder(Query query);
-	
+
+	List<DormitoryBuildingEntity> queryAllDormitorys();
+
+	List<PickupAddressEntity> queryAllPickupAddress();
 }

@@ -42,11 +42,14 @@ public class OrderServiceEntity implements Serializable {
 	private BigDecimal payPrice;
 	@Excel(name = "快递规格", width = 30, isImportField = "express_spec")
 	private String expressSpec;
-	
+
+	//发布人姓名
 	private String realName;
-	
+
+	//发布人手机
 	private String mobile;
-	
+
+	//收货地址
 	private String roomNumber;
 
 	/**

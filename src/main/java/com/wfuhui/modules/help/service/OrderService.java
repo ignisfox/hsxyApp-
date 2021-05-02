@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.wfuhui.common.utils.Query;
+import com.wfuhui.modules.help.entity.DormitoryBuildingEntity;
 import com.wfuhui.modules.help.entity.OrderEntity;
+import com.wfuhui.modules.help.entity.PickupAddressEntity;
 
 /**
  * 订单
@@ -35,4 +37,7 @@ public interface OrderService {
 	int grabOrder(Integer orderId, Integer userId);
 
 	List<OrderEntity> queryCourierOrder(Query query);
+
+	List<DormitoryBuildingEntity> queryAllDormitorys();
+	List<PickupAddressEntity> queryAllPickupAddress();
 }

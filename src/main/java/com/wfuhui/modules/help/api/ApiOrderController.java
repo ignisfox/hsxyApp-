@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.wfuhui.modules.help.entity.DormitoryBuildingEntity;
+import com.wfuhui.modules.help.entity.PickupAddressEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +34,8 @@ public class ApiOrderController {
 	@Autowired
 	private OrderService orderService;
 
+	
+
 	@Login
 	@PostMapping("createOrder")
 	public R createOrder(@RequestAttribute("userId") Integer userId, @RequestBody OrderEntity orderEntity){
@@ -42,11 +46,35 @@ public class ApiOrderController {
 		return R.ok();
 	}
 
+	/**
+	 * 获取收货地址的宿舍楼信息
+	 * @return
+	 */
+
+	@AuthIgnore
+	@GetMapping("dormitory")
+	public R getDormitory(){
+		List<DormitoryBuildingEntity> dormitoryBuildingEntities=orderService.queryAllDormitorys();
+		return R.ok().put("dormitoryBuildingEntities",dormitoryBuildingEntities);
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+
+	@AuthIgnore
+	@GetMapping("address")
+	public R getPickupAddress(){
+		List<PickupAddressEntity> pickupAddressEntities=orderService.queryAllPickupAddress();
+		return R.ok().put("pickupAddressEntities",pickupAddressEntities);
+	}
+
 
 	@Login
 	@GetMapping("myOrderservice")
     public R myOrderservice(@RequestAttribute("userId") Integer userId, @RequestParam Map<String, Object> params){
-		params.put("memberId", userId);
+		params.put("memberId", userId);//2
     	Query query = new Query(params);
     	List<OrderEntity> orderList = orderService.queryList(query);
         return R.ok().put("orderList", orderList);
